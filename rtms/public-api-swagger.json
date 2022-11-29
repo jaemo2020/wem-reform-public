@@ -7,7 +7,7 @@
 			"name": "AEMO Real Time Market Submissions Team",
 			"email": "wa.operations@aemo.com.au"
 		},
-		"version": "0.11-DRAFT"
+		"version": "0.12-DRAFT"
 	},
 	"paths": {
 		"/api/rtms/v1/submissions": {
@@ -646,22 +646,6 @@
 							}
 						}
 					},
-					"415": {
-						"description": "Unsupported Media Type",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/error415Response"
-								},
-								"example": {
-									"type": "https://tools.ietf.org/html/rfc7231#section-6.5.13",
-									"title": "Unsupported Media Type",
-									"status": 415,
-									"traceId": "00-95f8bcc8f174994786407b713784846d-d53accae1812904b-00"
-								}
-							}
-						}
-					},
 					"500": {
 						"description": "Internal Server Error",
 						"content": {
@@ -897,22 +881,6 @@
 							}
 						}
 					},
-					"415": {
-						"description": "Unsupported Media Type",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/error415Response"
-								},
-								"example": {
-									"type": "https://tools.ietf.org/html/rfc7231#section-6.5.13",
-									"title": "Unsupported Media Type",
-									"status": 415,
-									"traceId": "00-95f8bcc8f174994786407b713784846d-d53accae1812904b-00"
-								}
-							}
-						}
-					},
 					"500": {
 						"description": "Internal Server Error",
 						"content": {
@@ -1059,22 +1027,6 @@
 											"source": null
 										}
 									]
-								}
-							}
-						}
-					},
-					"415": {
-						"description": "Unsupported Media Type",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/error415Response"
-								},
-								"example": {
-									"type": "https://tools.ietf.org/html/rfc7231#section-6.5.13",
-									"title": "Unsupported Media Type",
-									"status": 415,
-									"traceId": "00-95f8bcc8f174994786407b713784846d-d53accae1812904b-00"
 								}
 							}
 						}
@@ -1309,22 +1261,6 @@
 											"source": null
 										}
 									]
-								}
-							}
-						}
-					},
-					"415": {
-						"description": "Unsupported Media Type",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/error415Response"
-								},
-								"example": {
-									"type": "https://tools.ietf.org/html/rfc7231#section-6.5.13",
-									"title": "Unsupported Media Type",
-									"status": 415,
-									"traceId": "00-95f8bcc8f174994786407b713784846d-d53accae1812904b-00"
 								}
 							}
 						}
@@ -1715,6 +1651,8 @@
 																		{
 																			"dispatchIntervalFrom": 74,
 																			"dispatchIntervalTo": 80,
+																			"unconstrainedInjectionForecast": 50,
+																			"unconstrainedWithdrawalForecast": 0,
 																			"maxInjectionCapacity": 50,
 																			"maxWithdrawalCapacity": 0,
 																			"inflexibleFlag": "NO",
@@ -1865,7 +1803,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/ungroupedConsolidatedEnergyApiResponse"
+									"$ref": "#/components/schemas/consolidatedEnergyApiResponse"
 								},
 								"examples": {
 									"example1": {
@@ -1879,6 +1817,8 @@
 													"dispatchIntervalNo": "1-288",
 													"dispatchIntervalTimeFrom": "08:00",
 													"dispatchIntervalTimeTo": "08:00",
+													"unconstrainedInjectionForecast": 30,
+													"unconstrainedWithdrawalForecast": 0,
 													"maxInjectionCapacity": 30,
 													"maxWithdrawalCapacity": 0,
 													"inflexibleFlag": false,
@@ -2179,7 +2119,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/ungroupedConsolidatedEssApiResponse"
+									"$ref": "#/components/schemas/consolidatedEssApiResponse"
 								},
 								"examples": {
 									"example1": {
@@ -2494,7 +2434,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/ungroupedConsolidatedDspApiResponse"
+									"$ref": "#/components/schemas/consolidatedDspApiResponse"
 								},
 								"examples": {
 									"example1": {
@@ -2508,7 +2448,8 @@
 													"dispatchIntervalNo": "1-288",
 													"dispatchIntervalTimeFrom": "08:00",
 													"dispatchIntervalTimeTo": "08:00",
-													"withdrawalQuantity": -25,
+													"dspUnconstrainedWithdrawalQuantity": 25,
+													"dspConstrainedWithdrawalQuantity": 25,
 													"submissionType": "Variation",
 													"submissionDateTime": "2022-03-16T16:29:40+08:00"
 												}
@@ -2712,6 +2653,316 @@
 											"source": null
 										}
 									]
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/rtms/v1/consolidated": {
+			"get": {
+				"tags": [
+					"Consolidated"
+				],
+				"description": "Retrieves the consolidated view of submissions for all or specific facilities within a date range (not geater than 10 days)",
+				"summary": "API endpoint that handles retrieving batched consolidated dispatch intervals for multiple facilities, markets and trading days",
+				"parameters": [
+					{
+						"name": "TradingDayFrom",
+						"in": "query",
+						"required": true,
+						"description": "From trading day (YYYY-MM-DD) inclusive",
+						"schema": {
+							"type": "string",
+							"format": "date"
+						}
+					},
+					{
+						"name": "TradingDayTo",
+						"in": "query",
+						"required": true,
+						"description": "To trading day (YYYY-MM-DD) inclusive",
+						"schema": {
+							"type": "string",
+							"format": "date"
+						}
+					},
+					{
+						"name": "Facilities",
+						"in": "query",
+						"required": false,
+						"description": "Comma Separated Values (CSV) list of facilitie(s)",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/consolidatedBatchApiResponse"
+								},
+								"examples": {
+									"example1": {
+										"summary": "Data is available for the date range. Include all facilities owned and applicable markets.",
+										"value": {
+											"transactionId": "5511acad-87e8-4e74-be75-0e477dd4e5aa",
+											"asAt": "2022-03-16T16:23:46.9911042+08:00",
+											"data": [
+												{
+													"applicability": [
+														{
+															"tradingDate": "2022-12-05",
+															"dispatchIntervalFrom": 1,
+															"dispatchIntervalTo": 19
+														},
+														{
+															"tradingDate": "2022-12-06",
+															"dispatchIntervalFrom": 1,
+															"dispatchIntervalTo": 288
+														}
+													],
+													"facility": "MyTestFacility1",
+													"marketService": "Energy",
+													"submissionId": "b0260932-a61f-4faf-a309-8f61e800976b",
+													"submissionType": "Variation",
+													"submissionCode": "OTHER",
+													"submissionDateTime": "2022-11-21T11:28:46.8380175+08:00",
+													"energy": {
+														"unconstrainedInjectionForecast": 16,
+														"unconstrainedWithdrawalForecast": 0,
+														"maxInjectionCapacity": 16,
+														"maxWithdrawalCapacity": 0,
+														"inflexibleFlag": "NO",
+														"maxUpwardRampRate": 3,
+														"maxDownwardRampRate": 3,
+														"fsip": null,
+														"tranches": [
+															{
+																"tranche": 1,
+																"price": "MIN",
+																"quantity": 0.1,
+																"noticeTime": null,
+																"capacityType": "IN-SERVICE",
+																"fuelType": "NON-LIQUID"
+															},
+															{
+																"tranche": 2,
+																"price": "MAX",
+																"quantity": 15.9,
+																"noticeTime": null,
+																"capacityType": "IN-SERVICE",
+																"fuelType": "NON-LIQUID"
+															}
+														]
+													},
+													"ess": null,
+													"dsp": null
+												},
+												{
+													"applicability": [
+														{
+															"tradingDate": "2022-12-05",
+															"dispatchIntervalFrom": 20,
+															"dispatchIntervalTo": 38
+														}
+													],
+													"facility": "MyTestFacility2",
+													"marketService": "RegulationRaise",
+													"submissionId": "b0260932-a61f-4faf-a309-8f61e800976b",
+													"submissionType": "Standing",
+													"submissionCode": null,
+													"submissionDateTime": "2022-11-21T11:28:46.8380175+08:00",
+													"energy": null,
+													"ess": {
+														"maximumCapacity": 59.4,
+														"enablementMinimum": 10,
+														"enablementMaximum": 30,
+														"lowBreakpoint": 15,
+														"highBreakpoint": 25,
+														"tranches": [
+															{
+																"tranche": 1,
+																"price": "-100.99",
+																"quantity": 29.4,
+																"noticeTime": null,
+																"capacityType": "IN-SERVICE",
+																"fuelType": "NON-LIQUID"
+															},
+															{
+																"tranche": 2,
+																"price": "-50.35",
+																"quantity": 30,
+																"noticeTime": null,
+																"capacityType": "IN-SERVICE",
+																"fuelType": "NON-LIQUID"
+															}
+														]
+													},
+													"dsp": null
+												}
+											]
+										}
+									},
+									"example2": {
+										"summary": "No data available for the specified parameters, or data not accessible to the participant",
+										"value": {
+											"transactionId": "6013c15d-1d59-4f11-9e5b-3a21c5034c7a",
+											"data": []
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/errorResponse"
+								},
+								"examples": {
+									"example1": {
+										"summary": "One or more mandatory parameters is missing",
+										"value": {
+											"transactionId": "650e2d1e-1473-452a-a544-7f6911da39f8",
+											"errors": [
+												{
+													"code": "ERR400",
+													"title": "Bad Request",
+													"detail": "Mandatory parameter value is missing",
+													"source": {
+														"parameter": "tradingdayfrom"
+													}
+												},
+												{
+													"code": "ERR400",
+													"title": "Bad Request",
+													"detail": "Mandatory parameter value is missing",
+													"source": {
+														"parameter": "tradingdayto"
+													}
+												}
+											]
+										}
+									},
+									"example2": {
+										"summary": "Specified trading day is in the wrong format",
+										"value": {
+											"transactionId": "c8d3a0f4-5b2e-4787-8e23-26f8df3effdb",
+											"errors": [
+												{
+													"code": "ERR400",
+													"title": "Bad Request",
+													"detail": "Date needs to be formatted as yyyy-MM-dd without time information",
+													"source": {
+														"parameter": "tradingdayfrom=2021-11-26T08:00"
+													}
+												}
+											]
+										}
+									},
+									"example3": {
+										"summary": "The specified day range exceeding 10 days",
+										"value": {
+											"transactionId": "6f0b6dcb-756c-4cfd-8a78-b9b6a63a8da3",
+											"errors": [
+												{
+													"code": "ERR400",
+													"title": "Bad Request",
+													"detail": "Query dates range must be within 10 days",
+													"source": {
+														"parameter": "tradingdayfrom=2023-01-01&tradingdayto=2023-01-11"
+													}
+												}
+											]
+										}
+									},
+									"example4": {
+										"summary": "The specified day range is invalid",
+										"value": {
+											"transactionId": "6f0b6dcb-756c-4cfd-8a78-b9b6a63a8da3",
+											"errors": [
+												{
+													"code": "ERR400",
+													"title": "Bad Request",
+													"detail": "'tradingdayto' must not be before 'tradingdayfrom'",
+													"source": {
+														"parameter": "tradingdayfrom=2023-01-11&tradingdayto=2023-01-10"
+													}
+												}
+											]
+										}
+									},
+									"example5": {
+										"summary": "The specified value for a parameter is empty (even if optional)",
+										"value": {
+											"transactionId": "d5cf2f1e-9827-42ee-a5bd-18936b083d29",
+											"errors": [
+												{
+													"code": "ERR400",
+													"title": "Bad Request",
+													"detail": "Value for parameter facilities must be specified",
+													"source": {
+														"parameter": "facilities="
+													}
+												}
+											]
+										}
+									},
+									"example6": {
+										"summary": "A parameter has been specified more than once",
+										"value": {
+											"transactionId": "2425e75b-3f12-495b-870f-d87465549e46",
+											"errors": [
+												{
+													"code": "ERR400",
+													"title": "Bad Request",
+													"detail": "Duplicated parameter key is received",
+													"source": {
+														"parameter": "facilities"
+													}
+												}
+											]
+										}
+									},
+									"example7": {
+										"summary": "A specified parameter not allowed",
+										"value": {
+											"transactionId": "119c0c93-cae7-431e-9dd6-7b1cb3780995",
+											"errors": [
+												{
+													"code": "ERR400",
+													"title": "Bad Request",
+													"detail": "Parameter is not allowed",
+													"source": {
+														"parameter": "marketservice"
+													}
+												}
+											]
+										}
+									},
+									"example8": {
+										"summary": "One or more specified facilities does not exsit",
+										"value": {
+											"transactionId": "ce4b0b41-a33b-4abb-9130-f2f0190f3a05",
+											"errors": [
+												{
+													"code": "ERR400",
+													"title": "Bad Request",
+													"detail": "one or more facilities does not exist",
+													"source": {
+														"parameter": "facilities=1,2,3"
+													}
+												}
+											]
+										}
+									}
 								}
 							}
 						}
@@ -3111,13 +3362,18 @@
 				},
 				"additionalProperties": false
 			},
-			"ungroupedConsolidatedDspApiResponse": {
+			"consolidatedDspApiResponse": {
 				"type": "object",
 				"properties": {
 					"transactionId": {
 						"type": "string",
 						"format": "uuid",
 						"nullable": false
+					},
+					"asAt": {
+						"type": "string",
+						"format": "date-time",
+						"nullable": true
 					},
 					"data": {
 						"type": "array",
@@ -3129,13 +3385,18 @@
 				},
 				"additionalProperties": false
 			},
-			"ungroupedConsolidatedEnergyApiResponse": {
+			"consolidatedEnergyApiResponse": {
 				"type": "object",
 				"properties": {
 					"transactionId": {
 						"type": "string",
 						"format": "uuid",
 						"nullable": false
+					},
+					"asAt": {
+						"type": "string",
+						"format": "date-time",
+						"nullable": true
 					},
 					"data": {
 						"type": "array",
@@ -3147,7 +3408,7 @@
 				},
 				"additionalProperties": false
 			},
-			"ungroupedConsolidatedEssApiResponse": {
+			"consolidatedEssApiResponse": {
 				"type": "object",
 				"properties": {
 					"transactionId": {
@@ -3155,10 +3416,38 @@
 						"format": "uuid",
 						"nullable": false
 					},
+					"asAt": {
+						"type": "string",
+						"format": "date-time",
+						"nullable": true
+					},
 					"data": {
 						"type": "array",
 						"items": {
 							"$ref": "#/components/schemas/consolidatedEssResponse"
+						},
+						"nullable": true
+					}
+				},
+				"additionalProperties": false
+			},
+			"consolidatedBatchApiResponse": {
+				"type": "object",
+				"properties": {
+					"transactionId": {
+						"type": "string",
+						"format": "uuid",
+						"nullable": false
+					},
+					"asAt": {
+						"type": "string",
+						"format": "date-time",
+						"nullable": true
+					},
+					"data": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/consolidatedBatchResponse"
 						},
 						"nullable": true
 					}
@@ -3195,21 +3484,40 @@
 					"code": {
 						"type": "string",
 						"maxLength": 8,
-						"nullable": false
+						"nullable": true,
+						"description": "API or application specific warning code"
 					},
 					"title": {
 						"type": "string",
 						"format": "unlimited length",
-						"nullable": false
+						"nullable": false,
+						"description": "Summary of the warning message. It should not change from occurrence to occurrence of the problem"
 					},
 					"detail": {
 						"type": "string",
 						"format": "unlimited length",
-						"nullable": false
+						"nullable": false,
+						"description": "Description of the warning. Very specific to the occurrence of the problem"
 					},
 					"source": {
-						"type": "object",						
-						"nullable": true
+						"type": "object",
+						"nullable": true,
+						"description": "Contains references to the source of the warning. It may include the following Optional members",
+						"properties": {
+							"pointer": {
+								"type": "string",
+								"format": "unlimited length",
+								"nullable": true,
+								"description": "references the entity in the request payload that is causing the warning"
+							},
+							"parameter": {
+								"type": "string",
+								"format": "unlimited length",
+								"nullable": true,
+								"description": "indicates the URI query parameter that is causing the warning"
+							}
+						},
+						"additionalProperties": false
 					}
 				},
 				"additionalProperties": false
@@ -3370,31 +3678,31 @@
 			},
 			"market": {
 				"enum": [
-					"energy",
-					"regulationRaise",
-					"regulationLower",
-					"contingencyRaise",
-					"contingencyLower",
-					"rocof"
+					"Energy",
+					"RegulationRaise",
+					"RegulationLower",
+					"ContingencyRaise",
+					"ContingencyLower",
+					"Rocof"
 				],
 				"type": "string",
 				"maxLength": 30
 			},
 			"submissionType": {
 				"enum": [
-					"standing",
-					"variation",
-					"invalid"
+					"Standing",
+					"Variation",
+					"Invalid"
 				],
 				"type": "string",
 				"maxLength": 16
 			},
 			"submissionStatus": {
 				"enum": [
-					"submitted",
-					"rejected",
-					"valid",
-					"failed"
+					"Submitted",
+					"Rejected",
+					"Valid",
+					"Failed"
 				],
 				"type": "string",
 				"maxLength": 16
@@ -3571,7 +3879,12 @@
 						"format": "HH:mm",
 						"nullable": false
 					},
-					"withdrawalQuantity": {
+					"dspUnconstrainedWithdrawalQuantity": {
+						"type": "number",
+						"multipleOf": 0.001,
+						"nullable": false
+					},
+					"dspConstrainedWithdrawalQuantity": {
 						"type": "number",
 						"multipleOf": 0.001,
 						"nullable": false
@@ -3613,6 +3926,16 @@
 					"dispatchIntervalTimeTo": {
 						"type": "string",
 						"format": "HH:mm",
+						"nullable": false
+					},
+					"unconstrainedInjectionForecast": {
+						"type": "number",
+						"multipleOf": 0.001,
+						"nullable": false
+					},
+					"unconstrainedWithdrawalForecast": {
+						"type": "number",
+						"multipleOf": 0.001,
 						"nullable": false
 					},
 					"maxInjectionCapacity": {
@@ -3734,6 +4057,175 @@
 				"additionalProperties": false,
 				"description": "The structure that is used to send data out to external (UI/API)"
 			},
+			"consolidatedBatchResponse": {
+				"type": "object",
+				"properties": {
+					"applicability": {
+						"type": "array",
+						"items": {
+							"type": "object",
+							"properties": {
+								"tradingDate": {
+									"type": "string",
+									"format": "date",
+									"description": "YYYY-MM-DD",
+									"nullable": false
+								},
+								"dispatchIntervalFrom": {
+									"type": "integer",
+									"minimum": 1,
+									"maximum": 288
+								},
+								"dispatchIntervalTo": {
+									"type": "integer",
+									"minimum": 1,
+									"maximum": 288
+								}
+							},
+							"additionalProperties": false
+						},
+						"minItems": 1,
+						"nullable": false
+					},
+					"facility": {
+						"type": "string",
+						"nullable": false
+					},
+					"marketService": {
+						"$ref": "#/components/schemas/market",
+						"nullable": false
+					},
+					"submissionId": {
+						"type": "string",
+						"format": "uuid",
+						"nullable": false
+					},
+					"submissionType": {
+						"$ref": "#/components/schemas/submissionType",
+						"nullable": false
+					},
+					"submissionCode": {
+						"type": "string",
+						"nullable": true,
+						"description": "null for standing submission as it does not have submission code"
+					},
+					"submissionDateTime": {
+						"type": "string",
+						"format": "date-time",
+						"description": "YYYY-MM-DDTHH:mm:ss+08:00",
+						"nullable": false
+					},
+					"energy": {
+						"type": "object",
+						"properties": {
+							"unconstrainedInjectionForecast": {
+								"type": "number",
+								"multipleOf": 0.001,
+								"nullable": false
+							},
+							"unconstrainedWithdrawalForecast": {
+								"type": "number",
+								"multipleOf": 0.001,
+								"nullable": false
+							},
+							"maxInjectionCapacity": {
+								"type": "number",
+								"multipleOf": 0.001,
+								"nullable": false
+							},
+							"maxWithdrawalCapacity": {
+								"type": "number",
+								"multipleOf": 0.001,
+								"nullable": false
+							},
+							"inflexibleFlag": {
+								"type": "string",
+								"enum": [
+									"YES",
+									"NO"
+								]
+							},
+							"maxUpwardRampRate": {
+								"type": "number",
+								"multipleOf": 0.001,
+								"nullable": false
+							},
+							"maxDownwardRampRate": {
+								"type": "number",
+								"multipleOf": 0.001,
+								"nullable": false
+							},
+							"fsip": {
+								"$ref": "#/components/schemas/fsipResponse",
+								"nullable": true
+							},
+							"tranches": {
+								"type": "array",
+								"items": {
+									"$ref": "#/components/schemas/trancheResponse"
+								},
+								"nullable": false
+							}
+						},
+						"additionalProperties": false
+					},
+					"ess": {
+						"type": "object",
+						"properties": {
+							"maximumCapacity": {
+								"type": "number",
+								"multipleOf": 0.001,
+								"nullable": false
+							},
+							"enablementMinimum": {
+								"type": "number",
+								"multipleOf": 0.001,
+								"nullable": false
+							},
+							"enablementMaximum": {
+								"type": "number",
+								"multipleOf": 0.001,
+								"nullable": false
+							},
+							"lowBreakpoint": {
+								"type": "number",
+								"multipleOf": 0.001,
+								"nullable": false
+							},
+							"highBreakpoint": {
+								"type": "number",
+								"multipleOf": 0.001,
+								"nullable": false
+							},
+							"tranches": {
+								"type": "array",
+								"items": {
+									"$ref": "#/components/schemas/trancheResponse"
+								},
+								"nullable": false
+							}
+						},
+						"additionalProperties": false
+					},
+					"dsp": {
+						"type": "object",
+						"properties": {
+							"dspUnconstrainedWithdrawalQuantity": {
+								"type": "number",
+								"multipleOf": 0.001,
+								"nullable": false
+							},
+							"dspConstrainedWithdrawalQuantity": {
+								"type": "number",
+								"multipleOf": 0.001,
+								"nullable": false
+							}
+						},
+						"additionalProperties": false
+					}
+				},
+				"additionalProperties": false
+			},
 			"gcvResponse": {
 				"type": "object",
 				"properties": {
@@ -3817,32 +4309,6 @@
 						"items": {
 							"$ref": "#/components/schemas/errorInfo"
 						},
-						"nullable": false
-					}
-				},
-				"additionalProperties": false
-			},
-			"error415Response": {
-				"type": "object",
-				"properties": {
-					"type": {
-						"type": "string",
-						"format": "unlimited length",
-						"nullable": false
-					},
-					"title": {
-						"type": "string",
-						"format": "unlimited length",
-						"nullable": false
-					},
-					"status": {
-						"type": "integer",
-						"format": "int64",
-						"nullable": false
-					},
-					"traceId": {
-						"type": "string",
-						"format": "unlimited length",
 						"nullable": false
 					}
 				},
