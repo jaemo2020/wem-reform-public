@@ -1,0 +1,223 @@
+﻿{
+  "$schema": "http://json-schema.org/draft-01/schema#",
+  "$id": "https://aemo.com.au/wem-reform-market-dsp.json",
+  "title": "Submission",
+  "version": "0.11-DRAFT",
+  "description": "A schema for the DSP submission structure for RTMS project.",
+  "type": "object",
+  "properties": {
+    "standing": { "$ref": "#/definitions/standing" },
+    "variation": { "$ref": "#/definitions/variation" }
+  },
+  "oneOf": [
+    {
+      "required": [ "standing" ]
+    },
+    {
+      "required": [ "variation" ]
+    }
+  ],
+  "definitions": {
+    "standing": {
+      "type": "object",
+      "required": [
+        "effectiveTradingDateFrom",
+        "effectiveDispatchIntervalFrom",
+        "daysOfTheWeek"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "comment": {
+          "type": "string",
+          "description": "Participant provided comment or description for the submission.",
+          "maxLength": 280
+        },
+        "submissionReason": {
+          "type": "string",
+          "description": "Free text to provide more explanation on the reason of a sub-sequent submission.",
+          "maxLength": 280
+        },
+        "effectiveTradingDateFrom": {
+          "type": "string",
+          "description": "The Trading Day from which the Standing Real-Time Market Submission will take effect.",
+          "format": "date"
+        },
+        "effectiveDispatchIntervalFrom": {
+          "type": "integer",
+          "description": "The Dispatch Interval within the defined Effective Trading Date From from which the Standing Real-Time Market Submission will take effect.",
+          "minimum": 1,
+          "maximum": 288
+        },
+        "daysOfTheWeek": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/day"
+          },
+          "minItems": 1
+        }
+      }
+    },
+    "variation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "submissionCode",
+        "allowGateClosureViolation",
+        "tradingDays"
+      ],
+      "properties": {
+        "comment": {
+          "type": "string",
+          "description": "Participant provided comment or description for the submission.",
+          "maxLength": 280
+        },
+        "submissionCode": {
+          "type": "string",
+          "description": "Code to define the reason of a submission.",
+          "enum": [
+            "OUTAGE",
+            "MARKET",
+            "DIRECTION_FROM_AEMO",
+            "RC_TEST",
+            "OTHER"
+          ]
+        },
+        "submissionReason": {
+          "type": "string",
+          "description": "Free text to provide more explanation on the reason of a sub-sequent submission.",
+          "maxLength": 280
+        },
+        "allowGateClosureViolation": {
+          "type": "string",
+          "description": "Indication of whether the submission contains dispatch intervals within gate closure.",
+          "enum": [
+            "YES",
+            "NO"
+          ]
+        },
+        "tradingDays": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/tradingDay"
+          },
+          "minItems": 1
+        }
+      }
+    },
+    "day": {
+      "type": "object",
+      "description": "Object element to contain array of days of the week.",
+      "properties": {
+        "dayOfWeek": {
+          "type": "string",
+          "description": "Day of the week the Standing Real-Time Market Submission applies.",
+          "enum": [
+            "MON",
+            "TUE",
+            "WED",
+            "THU",
+            "FRI",
+            "SAT",
+            "SUN",
+            "WEEKDAY",
+            "WEEKEND",
+            "ALL"
+          ]
+        },
+        "energy": { "$ref": "#/definitions/energy" }
+      },
+      "required": [
+        "dayOfWeek",
+        "energy"
+      ],
+      "additionalProperties": false
+    },
+    "tradingDay": {
+      "type": "object",
+      "description": "Object element to contain array of days of the week.",
+      "properties": {
+        "dateFrom": {
+          "type": "string",
+          "format": "date",
+          "description": "Start Trading Day to which the following submission data applies."
+        },
+        "dateTo": {
+          "type": "string",
+          "format": "date",
+          "description": "End Trading Day to which the following submission data applies."
+        },
+        "energy": { "$ref": "#/definitions/energy" }
+      },
+      "required": [
+        "dateFrom",
+        "dateTo",
+        "energy"
+      ],
+      "additionalProperties": false
+    },
+    "energy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [ "facilities" ],
+      "properties": {
+        "facilities": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/energyFacility" },
+          "minItems": 1
+        }
+      }
+    },
+    "energyFacility": {
+      "type": "object",
+      "properties": {
+        "facilityCode": {
+          "type": "string",
+          "description": "Registered facility to which the following submission data applies."
+        },
+        "dispatchIntervals": {
+          "$ref": "#/definitions/energyInterval"
+        }
+      },
+      "required": [
+        "facilityCode",
+        "dispatchIntervals"
+      ],
+      "additionalProperties": false
+    },
+    "energyInterval": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "dispatchIntervalFrom": {
+            "type": "integer",
+            "description": "First Dispatch Interval to which the following Withdrawal Quantity applies.",
+            "minimum": 1,
+            "maximum": 288
+          },
+          "dispatchIntervalTo": {
+            "type": "integer",
+            "description": "Last Dispatch Interval to which the following Withdrawal Quantity applies.",
+            "minimum": 1,
+            "maximum": 288
+          },
+          "withdrawalQuantity": {
+            "type": "number",
+            "multipleOf": 0.001,
+            "maximum": 0,
+            "description": "The expected MW Withdrawal associated with a Demand Side Programme for the specified Dispatch Intervals"
+          }
+        },
+        "required": [
+          "dispatchIntervalFrom",
+          "dispatchIntervalTo",
+          "withdrawalQuantity"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1,
+      "maxItems": 288
+    }
+  },
+  "additionalProperties": false
+}
