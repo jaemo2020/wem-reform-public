@@ -1915,7 +1915,7 @@
 										}
 									},
 									"example2": {
-										"summary": "The specified trading day is in the wrong format",
+										"summary": "The specified Trading Day is in the wrong format",
 										"value": {
 											"transactionId": "c8d3a0f4-5b2e-4787-8e23-26f8df3effdb",
 											"errors": [
@@ -1931,7 +1931,7 @@
 										}
 									},
 									"example3": {
-										"summary": "The specified trading day is beyond the Acceptance Horizon",
+										"summary": "The specified Trading Day is beyond the Acceptance Horizon",
 										"value": {
 											"transactionId": "6f0b6dcb-756c-4cfd-8a78-b9b6a63a8da3",
 											"errors": [
@@ -2230,7 +2230,7 @@
 										}
 									},
 									"example2": {
-										"summary": "Specified trading day is in the wrong format",
+										"summary": "Specified Trading Day is in the wrong format",
 										"value": {
 											"transactionId": "c8d3a0f4-5b2e-4787-8e23-26f8df3effdb",
 											"errors": [
@@ -2246,7 +2246,7 @@
 										}
 									},
 									"example3": {
-										"summary": "The specified trading day is beyond the Acceptance Horizon",
+										"summary": "The specified Trading Day is beyond the Acceptance Horizon",
 										"value": {
 											"transactionId": "6f0b6dcb-756c-4cfd-8a78-b9b6a63a8da3",
 											"errors": [
@@ -2500,7 +2500,7 @@
 										}
 									},
 									"example2": {
-										"summary": "Specified trading day is in the wrong format",
+										"summary": "Specified Trading Day is in the wrong format",
 										"value": {
 											"transactionId": "c8d3a0f4-5b2e-4787-8e23-26f8df3effdb",
 											"errors": [
@@ -2516,7 +2516,7 @@
 										}
 									},
 									"example3": {
-										"summary": "The specified trading day is beyond the Acceptance Horizon",
+										"summary": "The specified Trading Day is beyond the Acceptance Horizon",
 										"value": {
 											"transactionId": "6f0b6dcb-756c-4cfd-8a78-b9b6a63a8da3",
 											"errors": [
@@ -2666,13 +2666,13 @@
 					"Consolidated"
 				],
 				"description": "Retrieves the consolidated view of submissions for all or specific facilities within a date range (not geater than 10 days)",
-				"summary": "API endpoint that handles retrieving batched consolidated dispatch intervals for multiple facilities, markets and trading days",
+				"summary": "API endpoint that handles retrieving batched consolidated dispatch intervals for multiple facilities, markets and Trading Days",
 				"parameters": [
 					{
 						"name": "TradingDayFrom",
 						"in": "query",
 						"required": true,
-						"description": "From trading day (YYYY-MM-DD) inclusive",
+						"description": "From Trading Day (YYYY-MM-DD) inclusive",
 						"schema": {
 							"type": "string",
 							"format": "date"
@@ -2682,7 +2682,7 @@
 						"name": "TradingDayTo",
 						"in": "query",
 						"required": true,
-						"description": "To trading day (YYYY-MM-DD) inclusive",
+						"description": "To Trading Day (YYYY-MM-DD) inclusive",
 						"schema": {
 							"type": "string",
 							"format": "date"
@@ -2852,7 +2852,7 @@
 										}
 									},
 									"example2": {
-										"summary": "Specified trading day is in the wrong format",
+										"summary": "Specified Trading Day is in the wrong format",
 										"value": {
 											"transactionId": "c8d3a0f4-5b2e-4787-8e23-26f8df3effdb",
 											"errors": [
