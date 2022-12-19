@@ -15,8 +15,8 @@
 				"tags": [
 					"Submission"
 				],
-				"description": "Retrieves historical submissions based on various parameters.",
-				"summary": "Get a list of submissions. Use the query parameters to refine and\r\napply a search criteria.",
+				"description": "Retrieves historical submissions based on various parameters. Results are paged with default page size of 500 unless specified otherwise.",
+				"summary": "Get a list of submissions (paged). Use the query parameters to refine and apply a search criteria.",
 				"parameters": [
 					{
 						"name": "submittedFrom",
@@ -112,6 +112,24 @@
 							"maxLength": 30,
 							"description": "Returns submissions made by the specified user."
 						}
+					},
+					{
+						"name": "pageSize",
+						"in": "query",
+						"schema": {
+							"type": "integer",
+							"minimum": 1,
+							"description": "(default = 500) the number of records per page. A warning message will be returned when there are more pages."
+						}
+					},
+					{
+						"name": "page",
+						"in": "query",
+						"schema": {
+							"type": "integer",
+							"minimum": 1,
+							"description": "(default = 1) The page number to fetch. A warning message will be returned when there are more pages."
+						}
 					}
 				],
 				"responses": {
@@ -139,8 +157,16 @@
 													"totalIntervals": 4032,
 													"marketServices": 2,
 													"facilities": 1,
-													"totalIntervalsGateClosure": 0
+													"totalIntervalsGateClosure": 0,
+													"rowNum": 1,
+													"totalRows": 3
 												}
+											],
+											"warnings": [
+											  {
+												"code": "INFO",
+												"message": "Showing only 1/3 records. Please refine your search filter or fetch more records by calling the submissions API with ?pageSize=500&page=2"
+											  }
 											]
 										}
 									},
@@ -156,7 +182,9 @@
 													"participant": "PARTICIPANT",
 													"uploadedBy": "USERNAME",
 													"submissionType": "Variation",
-													"submissionStatus": "Submitted"
+													"submissionStatus": "Submitted",
+													"rowNum": 1,
+													"totalRows": 1
 												}
 											]
 										}
