@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-01/schema#",
   "$id": "https://aemo.com.au/wem-reform-market-dsp.json",
   "title": "Submission",
-  "version": "0.11-DRAFT",
+  "version": "0.12-DRAFT",
   "description": "A schema for the DSP submission structure for RTMS project.",
   "type": "object",
   "properties": {
@@ -62,7 +62,6 @@
       "additionalProperties": false,
       "required": [
         "submissionCode",
-        "allowGateClosureViolation",
         "tradingDays"
       ],
       "properties": {
@@ -86,14 +85,6 @@
           "type": "string",
           "description": "Free text to provide more explanation on the reason of a sub-sequent submission.",
           "maxLength": 280
-        },
-        "allowGateClosureViolation": {
-          "type": "string",
-          "description": "Indication of whether the submission contains dispatch intervals within gate closure.",
-          "enum": [
-            "YES",
-            "NO"
-          ]
         },
         "tradingDays": {
           "type": "array",
@@ -201,17 +192,24 @@
             "minimum": 1,
             "maximum": 288
           },
-          "withdrawalQuantity": {
+          "dspUnconstrainedWithdrawalQuantity": {
             "type": "number",
             "multipleOf": 0.001,
-            "maximum": 0,
-            "description": "The expected MW Withdrawal associated with a Demand Side Programme for the specified Dispatch Intervals"
+            "minimum": 0,
+            "description": "A Market Participant’s estimate of the absolute value of the average unconstrained MW Withdrawal of its Demand Side Programme in a Dispatch Interval. This must be a positive number or zero."
+          },
+          "dspConstrainedWithdrawalQuantity": {
+            "type": "number",
+            "multipleOf": 0.001,
+            "minimum": 0,
+            "description": "A Market Participant’s estimate of the absolute value of the average constrained MW Withdrawal of its Demand Side Programme in a Dispatch Interval. This must be a positive number or zero."
           }
         },
         "required": [
           "dispatchIntervalFrom",
           "dispatchIntervalTo",
-          "withdrawalQuantity"
+          "dspUnconstrainedWithdrawalQuantity",
+          "dspConstrainedWithdrawalQuantity"
         ],
         "additionalProperties": false
       },

@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-10/schema#",
   "$id": "https://aemo.com.au/wem-reform-market-submission.json",
   "title": "Submission",
-  "version": "0.11-DRAFT",
+  "version": "0.12-DRAFT",
   "description": "A schema for the submission structure for RTMS project.",
   "type": "object",
   "properties": {
@@ -213,6 +213,18 @@
             "minimum": 1,
             "maximum": 288
           },
+          "unconstrainedInjectionForecast": {
+            "type": "number",
+            "multipleOf": 0.001,
+            "minimum": 0,
+            "description": "The expected MW level of Injection at the end of a Dispatch Interval for a Semi-Scheduled Facility or Non-Scheduled Facility, assuming that the Facility will not be subject to a Dispatch Instruction or direction from AEMO that limits its Injection. This must be a positive number or zero."
+          },
+          "unconstrainedWithdrawalForecast": {
+            "type": "number",
+            "multipleOf": 0.001,
+            "maximum": 0,
+            "description": "The expected MW level of Withdrawal at the end of a Dispatch Interval for a Semi-Scheduled Facility or Non-Scheduled Facility, assuming that the Facility will not be subject to a Dispatch Instruction or direction from AEMO that limits its Withdrawal. This must be a negative number or zero."
+          },
           "maxInjectionCapacity": {
             "type": "number",
             "multipleOf": 0.001,
@@ -296,6 +308,8 @@
         "required": [
           "dispatchIntervalFrom",
           "dispatchIntervalTo",
+          "unconstrainedInjectionForecast",
+          "unconstrainedWithdrawalForecast",
           "maxInjectionCapacity",
           "maxWithdrawalCapacity",
           "inflexibleFlag",
@@ -360,7 +374,7 @@
           "type": "number",
           "multipleOf": 0.001,
           "minimum": 0,
-          "description": "Total quantity of Regulation, Contingency Reserve or RoCoF Control Service the Facility is able to deliver for the defined Dispatch Intervals."
+          "description": "Total quantity (in MW) of Regulation, Contingency Reserve or RoCoF Control Service the Facility is able to deliver for the defined Dispatch Intervals."
         },
         "enablementMinimum": {
           "type": "number",
@@ -459,7 +473,6 @@
       },
       "required": [
         "tranche",
-        "fuelType",
         "quantity",
         "price",
         "capacityType"
